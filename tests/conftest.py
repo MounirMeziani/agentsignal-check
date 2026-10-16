@@ -11,7 +11,7 @@ def pytest_collection_modifyitems(config, items):
     skip = pytest.mark.skip(reason='LangGraph extra missing: run `uv run --extra test pytest` '
                                    'or `pip install -e ".[test]"`')
     for it in items:
-        if "needs_langgraph" in it.keywords or "langgraph" in it.nodeid:
+        if it.nodeid.startswith("tests/test_langgraph_crash.py") and "missing_extra" not in it.name:
             it.add_marker(skip)
 
 def pytest_terminal_summary(terminalreporter):
