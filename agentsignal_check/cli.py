@@ -8,6 +8,7 @@ def main(argv=None):
     p.add_argument("--version", action="version", version=f"agentsignal-check {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check", help="run detectors against a target agent")
+    c.add_argument("--version", action="version", version=f"agentsignal-check {__version__}")
     c.add_argument("--framework", default="langgraph", choices=["langgraph"])
     c.add_argument("--graph", required=True, help="module:factory; factory(checkpointer) -> compiled graph")
     c.add_argument("--effect", action="append", required=True, help="module:function side effect to watch (repeatable)")
