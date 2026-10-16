@@ -16,6 +16,12 @@ def main(argv=None):
     c.add_argument("--report", help="write a markdown report to this path")
     c.add_argument("--json", action="store_true", help="machine-readable output")
     a = p.parse_args(argv)
+    try:
+        import langgraph.checkpoint.sqlite  # noqa: F401
+    except ImportError:
+        print("agentsignal: LangGraph support not installed. Run:\n"
+              '  pip install "agentsignal-check[langgraph]"', file=sys.stderr)
+        return 2
     report = langgraph_crash.run(a.graph, a.effect, json.loads(a.input), json.loads(a.resume))
     if a.report:
         from .report import render

@@ -9,7 +9,8 @@ dependencies = []
 
 [project.optional-dependencies]
 langgraph = ["langgraph>=1.0", "langgraph-checkpoint-sqlite>=3.0"]
-dev = ["pytest"]
+test = ["pytest>=8", "agentsignal-check[langgraph]"]
+dev = ["agentsignal-check[test]"]
 
 [project.urls]
 Homepage = "https://tryagentsignal.com"

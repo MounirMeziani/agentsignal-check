@@ -33,8 +33,9 @@ Each scenario sets `AS_SCENARIO` to a unique path. If your effect writes to a lo
 ## Fixing failures
 Every FAIL in the report links to a free tested pattern on [tryagentsignal.com](https://tryagentsignal.com). Want it done for you? Use the [$79 Fix](https://tryagentsignal.com/fix).
 
-## Develop
+## Develop / test
 ```bash
-pip install -e '.[langgraph,dev]' && pytest -q
+uv run --extra test pytest -q          # or: pip install -e ".[test]" && pytest -q
 ```
+`test` installs pytest and the `langgraph` extra. If you run without it, the LangGraph tests are skipped with a note rather than failing with a cryptic error.
 MIT © Mounir Meziani

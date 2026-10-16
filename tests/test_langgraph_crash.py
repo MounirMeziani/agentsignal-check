@@ -31,3 +31,15 @@ def test_cli_exit_code_and_report(tmp_path):
     md = rp.read_text()
     assert "Verdict: **FAIL**" in md and "https://tryagentsignal.com/fix/" in md
     assert main(["check", "--graph", "tests.fixtures.idem_graph:build", "--effect", EFF[0], "--input", '{"amount":5}']) == 0
+
+def test_cli_missing_extra_message(monkeypatch, capsys):
+    import builtins
+    from agentsignal_check.cli import main
+    real = builtins.__import__
+    def fake(name, *a, **k):
+        if name.startswith("langgraph"):
+            raise ImportError(name)
+        return real(name, *a, **k)
+    monkeypatch.setattr(builtins, "__import__", fake)
+    assert main(["check", "--graph", "x:y", "--effect", "a:b"]) == 2
+    assert "agentsignal-check[langgraph]" in capsys.readouterr().err
