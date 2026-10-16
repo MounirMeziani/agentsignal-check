@@ -28,6 +28,8 @@ def main(argv=None):
               '  pip install "agentsignal-check[langgraph]"', file=sys.stderr)
         return 2
     report = langgraph_crash.run(a.graph, a.effect, json.loads(a.input), json.loads(a.resume))
+    from .env import collect
+    report["env"] = collect()
     if a.report:
         from .report import render
         open(a.report, "w").write(render(report, a.graph))
@@ -39,7 +41,7 @@ def main(argv=None):
     from . import card
     if a.html:
         import datetime
-        open(a.html, "w").write(card.render_html(report, a.graph, datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")))
+        open(a.html, "w").write(card.render_html(report, a.graph))
     if a.svg:
         card.export_svg(report, a.graph, a.svg)
     if a.png:

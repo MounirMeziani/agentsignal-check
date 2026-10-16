@@ -62,4 +62,18 @@ def test_json_output_unchanged_shape(monkeypatch, capsys):
     monkeypatch.setattr(cli.langgraph_crash, "run", lambda *a, **k: fake)
     import builtins; real = builtins.__import__
     assert cli.main(["check", "--graph", "m:f", "--effect", "a:b", "--json"]) == 1
-    assert json.loads(capsys.readouterr().out) == fake
+    out = json.loads(capsys.readouterr().out)
+    env = out.pop("env")
+    assert out == {"framework": "langgraph", "results": fake["results"]}
+    assert env["agentsignal_check"] and env["python"] and env["run_at"].endswith("Z")
+    assert env["packages"].get("langgraph")
+
+def test_env_in_html_and_card():
+    from agentsignal_check.env import collect, footer
+    r = rep(*["PASS"] * 5); r["env"] = collect()
+    f = footer(r["env"]); assert f.startswith("LangGraph ") and "Python " in f
+    assert f in card.render_html(r, "m:f")
+    from rich.console import Console
+    c = Console(record=True, width=80, file=io.StringIO(), force_terminal=True); c.print(card.build_renderable(r, "m:f"))
+    t = c.export_text(); assert "LangGraph " + r["env"]["packages"]["langgraph"] in t
+    assert max(len(l) for l in t.splitlines()) <= 80

@@ -54,7 +54,10 @@ def build_renderable(report, target):
             t.add_row("", Text(_short(r["detail"]), style="#ff9b9b" if r["status"] == "FAIL" else "yellow"))
             t.add_row("", Text(f"fix → {_disp(url)}", style="cyan"))
             fails.append(r)
+    from .env import footer
     foot = Text(TAGLINE, style="dim italic")
+    if footer(report.get("env")):
+        foot.append("\n" + footer(report["env"]), style="dim")
     return Panel(Group(head, Text(""), t, Text(""), foot), title="[bold]agentsignal check[/]",
                  subtitle="[dim]LangGraph · tryagentsignal.com[/]", border_style="#3ddc84" if s["all_pass"] else "#ff5c5c",
                  width=80, padding=(1, 2))
@@ -85,6 +88,8 @@ def print_card(report, target, file=None):
         print(f"agentsignal check: {target}", file=f)
         print(f"Approval flow: {s['passed']}/{s['total']} crash tests survived", file=f)
         print(f"Double-charge risk: {s['double_risk']}  Lost-approval risk: {s['lost_risk']}", file=f)
+        from .env import footer
+        if footer(report.get("env")): print(footer(report["env"]), file=f)
         for r in report["results"]:
             name, why, url = META.get(r["detector"], (r["detector"], "", SITE))
             print(f"[{r['status']}] {r['detector']}: {r['detail']}", file=f)
@@ -117,7 +122,9 @@ h1{font:600 30px/1.2 "Geist",ui-sans-serif,system-ui,sans-serif;margin:0 0 6px}.
 a{color:var(--acc)}.fix{font-size:14px;margin-top:2px}.foot{color:var(--dim);font-size:13px;margin-top:22px}"""
 
 def render_html(report, target, run_at=""):
+    from .env import footer
     s = summarize(report); e = _h.escape
+    run_at = run_at or footer(report.get("env"))
     grade = f"{s['passed']}/{s['total']}"
     rows = []
     for r in report["results"]:
