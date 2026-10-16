@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (2026-10-16)
+- **OpenAI Agents SDK:** `agentsignal check --framework openai-agents` with kill/resume, lost-approval, and replay detectors over `RunState.to_json()` / `RunState.from_json()`.
+- New `[openai-agents]` extra (`openai-agents>=0.24`); `test` extra now pulls it in.
+- Offline fixtures and pytest coverage for naive vs idempotent agents (`tests/fixtures/oai_*.py`, `tests/test_oai_crash.py`).
+- README: install and run notes for the openai-agents path.
+
 ## 0.2.1 (2026-10-15)
 - The card footer and HTML/OG tagline now read: "We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran."
 - The badge reads "Crash-tested by Agent Signal | N/M" by default, and "Agent Signal crash test | passing" only when all detectors pass on the run.
