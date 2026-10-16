@@ -5,7 +5,6 @@ It runs on your machine or in CI. It's free and MIT-licensed. Built by [Agent Si
 
 ```bash
 pip install "agentsignal-check[langgraph] @ git+https://github.com/MounirMeziani/agentsignal-check"
-# or: pip install git+https://github.com/MounirMeziani/agentsignal-check  (then: pip install langgraph langgraph-checkpoint-sqlite)
 
 agentsignal check --graph myapp.graph:build --effect myapp.payments:charge \
   --input '{"amount":1999}' --report agentsignal-report.md
