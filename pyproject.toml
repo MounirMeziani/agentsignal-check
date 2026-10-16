@@ -1,0 +1,26 @@
+[project]
+name = "agentsignal-check"
+version = "0.1.0"
+description = "Crash-test your AI agent for double execution and lost approvals"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = []
+
+[project.optional-dependencies]
+langgraph = ["langgraph>=1.0", "langgraph-checkpoint-sqlite>=3.0"]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://tryagentsignal.com"
+Source = "https://github.com/MounirMeziani/agentsignal-check"
+
+[project.scripts]
+agentsignal = "agentsignal_check.cli:main"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agentsignal_check*"]
