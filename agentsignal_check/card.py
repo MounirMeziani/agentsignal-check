@@ -2,6 +2,8 @@
 import html as _h, os, sys
 
 SITE = "https://tryagentsignal.com"
+FW = {"langgraph": "LangGraph", "openai-agents": "OpenAI Agents SDK"}
+def _fw(report): return FW.get(report.get("framework") or "langgraph", "LangGraph")
 TAGLINE = "We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran."
 DOUBLE = ("baseline", "double_execution.kill_resume", "double_execution.kill_before_checkpoint", "approval.replay")
 LOST = ("approval.lost_on_restart",)
@@ -55,11 +57,11 @@ def build_renderable(report, target):
             t.add_row("", Text(f"fix → {_disp(url)}", style="cyan"))
             fails.append(r)
     from .env import footer
-    foot = Text(TAGLINE, style="dim italic")
+    foot = Text(TAGLINE.replace("LangGraph", _fw(report)), style="dim italic")
     if footer(report.get("env")):
         foot.append("\n" + footer(report["env"]), style="dim")
     return Panel(Group(head, Text(""), t, Text(""), foot), title="[bold]agentsignal check[/]",
-                 subtitle="[dim]LangGraph · tryagentsignal.com[/]", border_style="#3ddc84" if s["all_pass"] else "#ff5c5c",
+                 subtitle=f"[dim]{_fw(report)} · tryagentsignal.com[/]", border_style="#3ddc84" if s["all_pass"] else "#ff5c5c",
                  width=80, padding=(1, 2))
 
 import re as _re
@@ -200,7 +202,7 @@ def render_png(report, target, path):
         d.text((760, y), name, font=mono(22), fill=fg)
         y += 40
     d.text((W - 80, H - 80), "tryagentsignal.com", font=mono(22), fill=dim, anchor="rs")
-    d.text((80, H - 80), "LangGraph · 5 crash tests", font=mono(22), fill=dim, anchor="ls")
+    d.text((80, H - 80), f"{_fw(report)} · {len(report['results'])} crash tests", font=mono(22), fill=dim, anchor="ls")
     im.save(path)
 
 # ---------------- badge ----------------

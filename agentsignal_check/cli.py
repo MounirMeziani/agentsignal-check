@@ -9,8 +9,10 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check", help="run detectors against a target agent")
     c.add_argument("--version", action="version", version=f"agentsignal-check {__version__}")
-    c.add_argument("--framework", default="langgraph", choices=["langgraph"])
-    c.add_argument("--graph", required=True, help="module:factory; factory(checkpointer) -> compiled graph")
+    c.add_argument("--framework", default="langgraph", choices=["langgraph", "openai-agents"])
+    c.add_argument("--graph", help="langgraph: module:factory; factory(checkpointer) -> compiled graph")
+    c.add_argument("--agent", help="openai-agents: module:factory; factory() -> agents.Agent with needs_approval tools")
+    c.add_argument("--context", default="{}", help="openai-agents: JSON run context (dict) passed to Runner.run")
     c.add_argument("--effect", action="append", required=True, help="module:function side effect to watch (repeatable)")
     c.add_argument("--input", default="{}", help="JSON input for the first invoke")
     c.add_argument("--resume", default="true", help="JSON value sent to every interrupt (auto-approve)")
@@ -22,13 +24,28 @@ def main(argv=None):
     c.add_argument("--badge-link", default="report.html", help="URL the badge links to (your latest report)")
     c.add_argument("--json", action="store_true", help="machine-readable output")
     a = p.parse_args(argv)
-    try:
-        import langgraph.checkpoint.sqlite  # noqa: F401
-    except ImportError:
-        print("agentsignal: LangGraph support not installed. Run:\n"
-              '  pip install "agentsignal-check[langgraph]"', file=sys.stderr)
-        return 2
-    report = langgraph_crash.run(a.graph, a.effect, json.loads(a.input), json.loads(a.resume))
+    if a.framework == "openai-agents":
+        if not a.agent:
+            p.error("--framework openai-agents needs --agent module:factory")
+        try:
+            import agents  # noqa: F401
+        except ImportError:
+            print("agentsignal: OpenAI Agents SDK support not installed. Run:\n"
+                  '  pip install "agentsignal-check[openai-agents]"', file=sys.stderr)
+            return 2
+        from .detectors import oai_crash
+        report = oai_crash.run(a.agent, a.effect, json.loads(a.context))
+        a.graph = a.agent
+    else:
+        if not a.graph:
+            p.error("--framework langgraph needs --graph module:factory")
+        try:
+            import langgraph.checkpoint.sqlite  # noqa: F401
+        except ImportError:
+            print("agentsignal: LangGraph support not installed. Run:\n"
+                  '  pip install "agentsignal-check[langgraph]"', file=sys.stderr)
+            return 2
+        report = langgraph_crash.run(a.graph, a.effect, json.loads(a.input), json.loads(a.resume))
     from .env import collect
     report["env"] = collect()
     if a.report:

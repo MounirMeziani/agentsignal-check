@@ -9,8 +9,9 @@ dependencies = ["rich>=13"]
 
 [project.optional-dependencies]
 langgraph = ["langgraph>=1.0", "langgraph-checkpoint-sqlite>=3.0"]
+openai-agents = ["openai-agents>=0.24"]
 png = ["pillow>=10"]
-test = ["pytest>=8", "agentsignal-check[langgraph,png]"]
+test = ["pytest>=8", "agentsignal-check[langgraph,openai-agents,png]"]
 dev = ["agentsignal-check[test]"]
 
 [project.urls]

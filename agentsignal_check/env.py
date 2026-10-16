@@ -2,7 +2,7 @@
 import datetime, platform
 from importlib import metadata
 
-PKGS = ["langgraph", "langgraph-checkpoint", "langgraph-checkpoint-sqlite", "langchain-core"]
+PKGS = ["langgraph", "langgraph-checkpoint", "langgraph-checkpoint-sqlite", "langchain-core", "openai-agents", "openai"]
 
 def collect():
     def v(p):
@@ -18,5 +18,6 @@ def footer(env):
     p = env.get("packages", {})
     parts = [f"LangGraph {p['langgraph']}" if p.get("langgraph") else None,
              f"checkpoint {p['langgraph-checkpoint']}" if p.get("langgraph-checkpoint") else None,
+             f"OpenAI Agents {p['openai-agents']}" if p.get("openai-agents") else None,
              f"Python {env.get('python')}", f"agentsignal-check {env.get('agentsignal_check')}", env.get("run_at")]
     return " · ".join(x for x in parts if x)

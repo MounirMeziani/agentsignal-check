@@ -49,6 +49,27 @@ The grade, risks and badge are computed only from the detector results of the cu
 
 A duplicate means the same effect args returned **different** results. A retry that returns the same result (for example, a provider idempotency key) passes.
 
+## Detectors (OpenAI Agents SDK, preview on branch oai-runstate)
+
+```bash
+pip install "agentsignal-check[openai-agents] @ git+https://github.com/MounirMeziani/agentsignal-check@oai-runstate"
+agentsignal check --framework openai-agents --agent myapp.agent:build \
+  --effect myapp.payments:charge --context '{"order_id": "order-42"}'
+```
+
+`build()` returns an `agents.Agent` whose side-effect tools use `needs_approval=True`. State crosses process
+boundaries only as `RunState.to_json()` / `RunState.from_json()`, as a real app would persist a paused run.
+
+| Detector | What it does |
+|---|---|
+| baseline | Clean run, approve once: does the effect run once? |
+| double_execution.kill_resume | Approve + resume, hard-kill (`os._exit(137)`) right after the effect, restart from the persisted RunState, approve again |
+| approval.lost_on_restart | Is the pending approval visible from a fresh process, and is an approval persisted via `to_json()` honoured without re-asking? |
+| approval.replay | The same persisted RunState resumed twice (double-click, worker retry, queue redelivery) |
+
+Real run, openai-agents 0.24.0, offline scripted model (`tests/fixtures/oai_*.py`): naive agent
+baseline PASS, kill_resume FAIL, lost_on_restart PASS, replay FAIL; idempotent agent (key = order_id + tool name) 4/4 PASS.
+
 ## Test scratch space
 Each scenario sets `AS_SCENARIO` to a unique path. If your effect writes to a local store during the check, key the store on it so scenarios don't leak into each other.
 
