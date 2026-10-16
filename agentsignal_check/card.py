@@ -2,6 +2,7 @@
 import html as _h, os, sys
 
 SITE = "https://tryagentsignal.com"
+from .links import fix_url
 FW = {"langgraph": "LangGraph", "openai-agents": "OpenAI Agents SDK"}
 def _fw(report): return FW.get(report.get("framework") or "langgraph", "LangGraph")
 TAGLINE = "We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran."
@@ -49,7 +50,7 @@ def build_renderable(report, target):
     t.add_column(width=6, no_wrap=True); t.add_column(ratio=1)
     fails = []
     for r in report["results"]:
-        name, why, url = META.get(r["detector"], (r["detector"], "", SITE))
+        name, why, _ = META.get(r["detector"], (r["detector"], "", SITE)); url = fix_url(r["detector"], report.get("framework"))
         t.add_row(Text(f"{SYM.get(r['status'],'?')} {r['status']}", style=COL.get(r["status"], "")), Text(name, style="bold"))
         t.add_row("", Text(why, style="dim"))
         if r["status"] != "PASS":
@@ -93,7 +94,7 @@ def print_card(report, target, file=None):
         from .env import footer
         if footer(report.get("env")): print(footer(report["env"]), file=f)
         for r in report["results"]:
-            name, why, url = META.get(r["detector"], (r["detector"], "", SITE))
+            name, why, _ = META.get(r["detector"], (r["detector"], "", SITE)); url = fix_url(r["detector"], report.get("framework"))
             print(f"[{r['status']}] {r['detector']}: {r['detail']}", file=f)
             if r["status"] != "PASS":
                 print(f"    fix: {url}", file=f)
@@ -130,7 +131,7 @@ def render_html(report, target, run_at=""):
     grade = f"{s['passed']}/{s['total']}"
     rows = []
     for r in report["results"]:
-        name, why, url = META.get(r["detector"], (r["detector"], "", SITE))
+        name, why, _ = META.get(r["detector"], (r["detector"], "", SITE)); url = fix_url(r["detector"], report.get("framework"))
         extra = "" if r["status"] == "PASS" else f'<div class="detail">{e(_short(r["detail"], 200))}</div><div class="fix"><a href="{url}">fix → {e(_disp(url))}</a></div>'
         rows.append(f'<div class="row"><div class="st {r["status"]}">{SYM.get(r["status"],"?")} {r["status"]}</div>'
                     f'<div><div class="name">{e(name)} <span class="why">· {e(r["detector"])}</span></div><div class="why">{e(why)}</div>{extra}</div></div>')

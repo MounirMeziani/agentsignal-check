@@ -1,6 +1,6 @@
 """Markdown report with fix links."""
 import datetime
-SITE = "https://tryagentsignal.com"
+from .links import SITE, fix_url, WHY_OAI
 FIX = {
     "baseline": ("Side effect runs before/with interrupt() in the same node; LangGraph re-runs the whole node on resume.",
                  f"{SITE}/templates/langgraph-idempotent-approval/"),
@@ -25,7 +25,9 @@ def render(report, target):
     if fails:
         out += ["", "## How to fix", ""]
         for r in fails:
-            why, url = FIX.get(r["detector"], ("", SITE))
+            why, _ = FIX.get(r["detector"], ("", SITE))
+            if report.get("framework") == "openai-agents": why = WHY_OAI.get(r["detector"], why)
+            url = fix_url(r["detector"], report.get("framework"))
             out.append(f"- **{r['detector']}**: {why} Pattern: {url}")
         out += ["", f"Want it fixed for you? **[$79 Fix]({SITE}/fix/)**: we patch your approval flow and re-run this check. "
                 f"Or get every tested template + updates with **[Signal Pro]({SITE}/pricing/)**."]
