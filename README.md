@@ -2,6 +2,8 @@
 
 ![agentsignal check report card: real run against the naive example graph, 1/5 crash tests survived](docs/report-card.png)
 
+*We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran.* (A real run against the intentionally broken example graph.)
+
 Crash-test your AI agent for **double execution** and **lost approvals** before your users find them.
 It runs on your machine or in CI. It's free and MIT-licensed. Built by [Agent Signal](https://tryagentsignal.com).
 
@@ -26,13 +28,13 @@ agentsignal check --graph myapp.graph:build --effect myapp.payments:charge \
 - **Terminal:** an 80-column report card with the grade ("Approval flow: 3/5 crash tests survived"), double-charge and lost-approval risk, and one row per detector with why and how to fix. With `NO_COLOR` set or output piped, it prints plain text. `--json` output is unchanged.
 - `--html`: a self-contained dark report page with OG/Twitter meta, and `--svg` exports the terminal card.
 - `--png`: a 1200×630 OG card. It needs `pip install "agentsignal-check[png]"` (Pillow).
-- `--badge`: a static SVG plus a README snippet. For example:
+- `--badge`: a static SVG plus a README snippet. The badge reads **Crash-tested by Agent Signal | N/M** (amber) by default. It switches to **Agent Signal crash test | passing** (green) only when all 5 detectors passed on that run. For example:
   ```bash
   agentsignal check --graph myapp.graph:build --effect myapp.payments:charge \
     --badge docs/agentsignal-badge.svg --badge-link https://example.com/report.html
-  # prints: [![Crash-tested by Agent Signal: 5/5 passed](docs/agentsignal-badge.svg)](https://example.com/report.html)
+  # prints e.g.: [![Crash-tested by Agent Signal: 3/5 passed](docs/agentsignal-badge.svg)](https://example.com/report.html)
   ```
-  Commit the SVG and paste the snippet into your README. Re-run in CI to keep it current. It says **passing** only when every detector passed on this run; otherwise it shows `N/M` in amber.
+  Commit the SVG, paste the snippet into your README, and link it to that repo's latest report. Re-run in CI so it reflects the current commit.
 
 The grade, risks and badge are computed only from the detector results of the current run. The screenshot at the top is a real run against `tests/fixtures/naive_graph.py`, the intentionally broken example. Regenerate it with `scripts/shots.sh`.
 

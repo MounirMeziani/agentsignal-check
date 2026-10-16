@@ -17,6 +17,9 @@ def test_grade_and_risk_come_from_results():
     assert s["double_risk"] == "UNKNOWN" and s["lost_risk"] == "HIGH" and s["passed"] == 3
     assert card.summarize(rep(*["PASS"] * 5))["all_pass"]
 
+def test_card_footer_is_caption_1a():
+    assert card.TAGLINE == "We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran."
+
 def test_short_detail_copies_real_count():
     assert "executed 3×" in card._short("crash after effect #1 -> re-executed {'tests.fixtures.payments:charge(1999,)[]': 3}")
 
@@ -50,9 +53,11 @@ def test_png_is_1200x630(tmp_path):
 
 def test_badge_passing_only_when_all_pass():
     svg, md = card.render_badge(rep(*["PASS"] * 5), "https://x/report")
-    assert ">passing<" in svg and "5/5 passed" in md and "](https://x/report)" in md
+    assert ">passing<" in svg and ">Agent Signal crash test<" in svg
+    assert "[![Agent Signal crash test: passing]" in md and "](https://x/report)" in md
     svg, md = card.render_badge(rep("PASS", "FAIL", "PASS", "PASS", "PASS"))
-    assert "passing" not in svg and ">4/5<" in svg and "#dfb317" in svg and "4/5 passed" in md
+    assert "passing" not in svg and ">Crash-tested by Agent Signal<" in svg and ">4/5<" in svg and "#dfb317" in svg
+    assert "Crash-tested by Agent Signal: 4/5 passed" in md
     svg, _ = card.render_badge(rep(*["FAIL"] * 5))
     assert ">0/5<" in svg and "#dfb317" in svg
 

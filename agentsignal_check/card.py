@@ -2,7 +2,7 @@
 import html as _h, os, sys
 
 SITE = "https://tryagentsignal.com"
-TAGLINE = "Five crash tests for LangGraph approval flows. Each one prints pass or fail with the run that proved it."
+TAGLINE = "We kill your LangGraph agent mid-approval, restart it, and count how many times the tool ran."
 DOUBLE = ("baseline", "double_execution.kill_resume", "double_execution.kill_before_checkpoint", "approval.replay")
 LOST = ("approval.lost_on_restart",)
 META = {  # short name, one-line why (what the test does), fix link
@@ -209,8 +209,11 @@ def _w(t):  # rough Verdana 11px width, like shields.io
 
 def render_badge(report, link="report.html"):
     s = summarize(report)
-    label = "Agent Signal crash test"
-    msg = "passing" if s["all_pass"] else f"{s['passed']}/{s['total']}"
+    # captions 3a by default; 3b ("passing") only when every detector passed on this run
+    if s["all_pass"]:
+        label, msg = "Agent Signal crash test", "passing"
+    else:
+        label, msg = "Crash-tested by Agent Signal", f"{s['passed']}/{s['total']}"
     color = "#3ddc84" if s["all_pass"] else "#dfb317"  # passing only when ALL detectors pass
     lw, mw = _w(label), _w(msg); W = lw + mw
     e = _h.escape
@@ -220,6 +223,6 @@ def render_badge(report, link="report.html"):
 <rect x="{lw}" width="{mw}" height="20" fill="{color}"/><rect width="{W}" height="20" fill="url(#s)"/></g>
 <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="{lw/2}" y="14">{e(label)}</text>
 <text x="{lw + mw/2}" y="14" fill="#000">{e(msg)}</text></g></svg>"""
-    alt = f"Crash-tested by Agent Signal: {s['passed']}/{s['total']} passed"
+    alt = "Agent Signal crash test: passing" if s["all_pass"] else f"Crash-tested by Agent Signal: {s['passed']}/{s['total']} passed"
     md = f"[![{alt}](agentsignal-badge.svg)]({link})"
     return svg, md
