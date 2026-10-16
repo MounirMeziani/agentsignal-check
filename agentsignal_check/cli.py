@@ -23,6 +23,8 @@ def main(argv=None):
     c.add_argument("--badge", help="write a shields-style SVG badge here and print a README snippet")
     c.add_argument("--badge-link", default="report.html", help="URL the badge links to (your latest report)")
     c.add_argument("--json", action="store_true", help="machine-readable output")
+    c.add_argument("--upload", action="store_true", help="Pro: upload the JSON report (needs AGENTSIGNAL_API_KEY)")
+    c.add_argument("--upload-strict", action="store_true", help="with --upload: exit 3 if the upload fails")
     a = p.parse_args(argv)
     if a.framework == "openai-agents":
         if not a.agent:
@@ -69,7 +71,13 @@ def main(argv=None):
         open(a.badge, "w").write(svg)
         md = md.replace("agentsignal-badge.svg", a.badge)
         print(md, file=sys.stderr if a.json else sys.stdout)
-    return 1 if any(r["status"] == "FAIL" for r in report["results"]) else 0
+    code = 1 if any(r["status"] == "FAIL" for r in report["results"]) else 0
+    if a.upload or a.upload_strict:
+        from .upload import upload
+        ok, why = upload(report, out=sys.stderr if a.json else sys.stdout)
+        if not ok and a.upload_strict and code == 0:
+            return 3
+    return code
 
 if __name__ == "__main__":
     sys.exit(main())

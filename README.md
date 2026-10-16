@@ -73,6 +73,15 @@ baseline PASS, kill_resume FAIL, lost_on_restart PASS, replay FAIL; idempotent a
 ## Test scratch space
 Each scenario sets `AS_SCENARIO` to a unique path. If your effect writes to a local store during the check, key the store on it so scenarios don't leak into each other.
 
+## Upload runs (Signal Pro)
+
+```bash
+export AGENTSIGNAL_API_KEY=...   # create one at https://tryagentsignal.com/pro/keys
+agentsignal check --graph app:build --effect app.tools:charge --json --upload
+```
+
+Prints the `run_id` and fix links for every FAIL. Upload errors (bad key, too large, rate limit, network) are reported but don't change the exit code unless you pass `--upload-strict` (exit 3). Without a key, `--upload` only prints a one-line hint.
+
 ## Fixing failures
 Every FAIL in the report links to a free tested pattern on [tryagentsignal.com](https://tryagentsignal.com). Want it done for you? Use the [$79 Fix](https://tryagentsignal.com/fix).
 

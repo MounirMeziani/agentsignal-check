@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- **`--upload` (Signal Pro):** posts the `--json` report to `https://tryagentsignal.com/api/check/runs` with `Authorization: Bearer $AGENTSIGNAL_API_KEY` (override the URL with `AGENTSIGNAL_API_URL`) and prints the returned `run_id` and fix links. 401, 413, 429 and network errors print a clear message and never change the exit code; add `--upload-strict` to exit 3 when the upload fails on an otherwise passing run. With no key, `--upload` prints a one-line hint and the check runs exactly as before. With `--json`, upload messages go to stderr so stdout stays pure JSON.
+
 ## 0.3.0 (2026-10-16)
 - **OpenAI Agents SDK:** `agentsignal check --framework openai-agents` with kill/resume, lost-approval, and replay detectors over `RunState.to_json()` / `RunState.from_json()`.
 - New `[openai-agents]` extra (`openai-agents>=0.24`); `test` extra now pulls it in.
