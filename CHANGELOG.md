@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.1 (2026-10-16)
 - **`--upload` (Signal Pro):** posts the `--json` report to `https://tryagentsignal.com/api/check/runs/` with `Authorization: Bearer $AGENTSIGNAL_API_KEY` (override the URL with `AGENTSIGNAL_API_URL`) and prints the returned `run_id` and fix links (detector, status, url). The body follows the server contract: `{report:{framework, results:[{detector, status, detail}], env}, repo, commit_sha, framework, version}`; statuses map to PASS/FAIL/ERROR/SKIP (WARN counts as FAIL, anything unknown as ERROR), and `repo`/`commit_sha` come from `GITHUB_REPOSITORY`/`GITHUB_SHA` or the local git checkout when available. 401, 403, 400, 413, 429 and network errors print a clear message and never change the exit code; add `--upload-strict` to exit 3 when the upload fails on an otherwise passing run. With no key, `--upload` prints a one-line hint and the check runs exactly as before. With `--json`, upload messages go to stderr so stdout stays pure JSON.
 
 ## 0.3.0 (2026-10-16)
