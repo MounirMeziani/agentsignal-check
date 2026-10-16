@@ -16,6 +16,18 @@ agentsignal check --graph myapp.graph:build --effect myapp.payments:charge \
 - `--report FILE`: writes a markdown report with fixes. `--json` prints machine-readable output.
 - Exit code 1 on any FAIL, so you can use it as a CI gate.
 
+## Report card, HTML, OG image, badge
+```bash
+agentsignal check --graph myapp.graph:build --effect myapp.payments:charge \
+  --html report.html --png og.png --badge agentsignal-badge.svg --badge-link https://example.com/report.html
+```
+- **Terminal:** an 80-column report card with the grade ("Approval flow: 3/5 crash tests survived"), double-charge and lost-approval risk, and one row per detector with why and how to fix. With `NO_COLOR` set or output piped, it prints plain text. `--json` output is unchanged.
+- `--html`: a self-contained dark report page with OG/Twitter meta, and `--svg` exports the terminal card.
+- `--png`: a 1200×630 OG card. It needs `pip install "agentsignal-check[png]"` (Pillow).
+- `--badge`: a static SVG plus a README snippet. It says **passing** only when every detector passed on this run; otherwise it shows `N/M` in amber.
+
+The grade, risks and badge are computed only from the detector results of the current run.
+
 ## Detectors (LangGraph)
 | id | fault injected | FAIL means |
 |---|---|---|

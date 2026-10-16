@@ -5,11 +5,12 @@ description = "Crash-test your AI agent for double execution and lost approvals"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-dependencies = []
+dependencies = ["rich>=13"]
 
 [project.optional-dependencies]
 langgraph = ["langgraph>=1.0", "langgraph-checkpoint-sqlite>=3.0"]
-test = ["pytest>=8", "agentsignal-check[langgraph]"]
+png = ["pillow>=10"]
+test = ["pytest>=8", "agentsignal-check[langgraph,png]"]
 dev = ["agentsignal-check[test]"]
 
 [project.urls]

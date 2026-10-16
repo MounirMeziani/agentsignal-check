@@ -14,6 +14,11 @@ def main(argv=None):
     c.add_argument("--input", default="{}", help="JSON input for the first invoke")
     c.add_argument("--resume", default="true", help="JSON value sent to every interrupt (auto-approve)")
     c.add_argument("--report", help="write a markdown report to this path")
+    c.add_argument("--html", help="write a self-contained HTML report card")
+    c.add_argument("--png", help="write a 1200x630 OG card PNG (needs the [png] extra)")
+    c.add_argument("--svg", help="write the terminal report card as SVG (rich export)")
+    c.add_argument("--badge", help="write a shields-style SVG badge here and print a README snippet")
+    c.add_argument("--badge-link", default="report.html", help="URL the badge links to (your latest report)")
     c.add_argument("--json", action="store_true", help="machine-readable output")
     a = p.parse_args(argv)
     try:
@@ -29,8 +34,21 @@ def main(argv=None):
     if a.json:
         print(json.dumps(report, indent=2))
     else:
-        for r in report["results"]:
-            print(f"[{r['status']}] {r['detector']}: {r['detail']}")
+        from .card import print_card
+        print_card(report, a.graph)
+    from . import card
+    if a.html:
+        import datetime
+        open(a.html, "w").write(card.render_html(report, a.graph, datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")))
+    if a.svg:
+        card.export_svg(report, a.graph, a.svg)
+    if a.png:
+        card.render_png(report, a.graph, a.png)
+    if a.badge:
+        svg, md = card.render_badge(report, a.badge_link)
+        open(a.badge, "w").write(svg)
+        md = md.replace("agentsignal-badge.svg", a.badge)
+        print(md, file=sys.stderr if a.json else sys.stdout)
     return 1 if any(r["status"] == "FAIL" for r in report["results"]) else 0
 
 if __name__ == "__main__":
