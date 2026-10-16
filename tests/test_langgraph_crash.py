@@ -29,5 +29,5 @@ def test_cli_exit_code_and_report(tmp_path):
     assert main(["check", "--graph", "tests.fixtures.naive_graph:build", "--effect", EFF[0],
                  "--input", '{"amount":5}', "--report", str(rp)]) == 1
     md = rp.read_text()
-    assert "Verdict: **FAIL**" in md and "https://tryagentsignal.com/fix" in md
+    assert "Verdict: **FAIL**" in md and "https://tryagentsignal.com/fix/" in md
     assert main(["check", "--graph", "tests.fixtures.idem_graph:build", "--effect", EFF[0], "--input", '{"amount":5}']) == 0
